@@ -208,13 +208,7 @@ cart.post('/', (req, res) => {
     //res.send('is it my code?');
 
     //let lastID = (cart.slice(-1)[0]); auto-generating id idea
-    const newItem = {
-        product: req.body.product,
-        qty: req.body.qty,
-        price: req.body.price,
-        id: req.body.id
-        // id: lastID + 1
-     }    
+    const newItem = req.body; 
         
      if (!newItem.product || !newItem.price || !newItem.qty ) {
          return res.status({ msg: 'Please include all three of the product name, price, and quantity.'});
