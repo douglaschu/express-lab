@@ -206,7 +206,7 @@ cart.get('/:id', (req, res) => {
 // c. Response Code: 201 (Created)
 cart.post('/', (req, res) => {
     //res.send('is it my code?');
-    let cart = [...myCart];
+
     //let lastID = (cart.slice(-1)[0]); auto-generating id idea
     const newItem = {
         product: req.body.product,
@@ -219,7 +219,7 @@ cart.post('/', (req, res) => {
      if (!newItem.product || !newItem.price || !newItem.qty ) {
          return res.status({ msg: 'Please include all three of the product name, price, and quantity.'});
      } 
-     cart.push(newItem);
+     myCart.push(newItem);
      res.json(newItem);
      res.status(201)
      //res.end();
