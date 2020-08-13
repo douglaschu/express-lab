@@ -14,10 +14,10 @@ app.use(cors());
 app.use('/cart-items', cart);
   //this is from Chris' example, I don't remember what this does
 
-app.get('*',(req, res) => {
-  res.status(201);
-  res.json('yes, the server is running')
-})
+// app.get('*',(req, res) => {
+//   res.status(201);
+//   res.json('yes, the server is running')
+// })
 
 
 
