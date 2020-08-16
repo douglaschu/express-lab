@@ -1,9 +1,12 @@
 const express = require('express');
-const cart = express.Router();
+const store = express.Router();
 const app = express();
 app.use(express.json());
+let autoID = 21; 
+    //generates ID by +1 to last hardcoded item ID: id = autoID++
+    //doesn't overwrite deleted items' IDs either  
 
-let myCart = [
+let cart = [
     {
         product: 'Yo-yo',
         price: 2.99,
@@ -137,29 +140,29 @@ let myCart = [
     // have none. (See tests below for examples.)
             
 // [domain]/cart-items (pulls up all cart items)
-cart.get('', (req, res) => {
-    let filtered = [...myCart];
+store.get('', (req, res) => {
+    let filteredCart = [...cart];
     // i. maxPrice = 3.0 - if specified, only include products that are at or below this price.
     if (req.query.maxPrice) {
-        filtered = filtered.filter(item => item.price <= req.query.maxPrice)
+        filteredCart = filteredCart.filter(item => item.price <= req.query.maxPrice)
     };
     // ii. prefix - if specified, only includes products that start with the given string 'fancy' in the response array.
     if (req.query.prefix) {
-        filtered = filtered.filter(item => item.product.startsWith(req.query.prefix));
+        filteredCart = filteredCart.filter(item => item.product.toLowerCase().startsWith(req.query.prefix.toLowerCase()));
     };
     // iii. pageSize = 10 - if specified, only includes up to the given number of items in the response array. For example, if there are ten items total, but pageSize=5, only return an array of the first five items.
     if (req.query.pageSize) {
+        filteredCart = filteredCart.slice(0, req.query.pageSize);
+    }   
         // req.query.pageSize = limit;
         // firstPage = cart.slice(0, limit);
-        // well, I wanted to store 'req.query.pageSize' into a nice contextual variable but it didn't work
-        filtered = filtered.slice(0, req.query.pageSize);
         //res.json(firstPage);
-        //res.sendStatus(200)
-            // === res.status(200).send('OK')
-        } 
-        //else {
-            res.json(filtered);
-            res.status(200)
+        // well, I wanted to store 'req.query.pageSize' into a nice contextual variable but it didn't work
+        
+        
+    res.status(200)
+    res.json(filteredCart);
+            
             // === res.status(200).send('OK')
         //}
            
@@ -187,8 +190,8 @@ cart.get('', (req, res) => {
     // c. Response Code: 200 (OK)
     // d. However, if the item with that ID cannot be found in the array, return a string
     // response “ID Not Found” with response code 404 (Not Found)
-cart.get('/:id', (req, res) => {
-    let cart = [...myCart];
+store.get('/:id', (req, res) => {
+    
     const found = cart.some(item => item.id === parseInt(req.params.id));
 
     if (found) {
@@ -204,24 +207,23 @@ cart.get('/:id', (req, res) => {
 // a. Action: Add a cart item to the array using the JSON body of the request. Also generate a unique ID for that item.
 // b. Response: the added cart item object as JSON.
 // c. Response Code: 201 (Created)
-cart.post('/', (req, res) => {
+store.post('/', (req, res) => {
     //res.send('is it my code?');
-    let cart = [...myCart];
     //let lastID = (cart.slice(-1)[0]); auto-generating id idea
     const newItem = {
         product: req.body.product,
         qty: req.body.qty,
         price: req.body.price,
-        id: req.body.id
-        // id: lastID + 1
+        id: autoID++
      }    
         
      if (!newItem.product || !newItem.price || !newItem.qty ) {
          return res.status({ msg: 'Please include all three of the product name, price, and quantity.'});
      } 
      cart.push(newItem);
-     res.json(newItem);
      res.status(201)
+     res.json(newItem);
+     
      //res.end();
      //getting error that says I'm sending HTTP headers twice (???)
 });
@@ -232,12 +234,12 @@ cart.post('/', (req, res) => {
 // body of the request as the new properties.
 // b. Response: the updated cart item object as JSON.
 // c. Response Code: 200 (OK).
-cart.put('/:id', (req, res) => {
-    let cart = [...myCart];
+store.put('/:id', (req, res) => {
+    
     const found = cart.some(item => item.id === parseInt(req.params.id));
 
     if (found) {
-        const editItem = req.body;
+        const editedItem = req.body;
         cart.forEach(item => {
             if(item.id === parseInt(req.params.id)) {
                 item.product = editedItem.product ? editedItem.product : item.product;
@@ -257,13 +259,12 @@ cart.put('/:id', (req, res) => {
 // a. Action: Remove the item from the array that has the given ID.
 // b. Response: Empty
 // c. Response Code: 204 (No Content)
-cart.delete('/:id', (req, res) => {
-    let cart = [...myCart];
+store.delete('/:id', (req, res) => {
     const found = cart.some(item => item.id === parseInt(req.params.id));
 
     if (found) {
+        res.status(200);
         res.json(cart.filter(item => item.id !== parseInt(req.params.id)));
-        res.status(200)
         // === res.status(200).send('OK')
     } else {
         res.status(404).json({ msg: `404'd! No product with an id of ${req.params.id} was found. Ow, my browser.`});
@@ -271,4 +272,4 @@ cart.delete('/:id', (req, res) => {
 
 })
     
- module.exports = cart
+ module.exports = store;
