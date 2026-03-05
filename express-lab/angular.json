@@ -119,6 +119,10 @@
           }
         }
       }
-    }},
-  "defaultProject": "express-lab"
+    }
+  },
+  "defaultProject": "express-lab",
+  "cli": {
+    "analytics": "bb5903f8-4477-4b87-bc4e-f2e235633c77"
+  }
 }
